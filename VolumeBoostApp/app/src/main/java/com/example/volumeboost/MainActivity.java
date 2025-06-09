@@ -22,12 +22,18 @@ public class MainActivity extends AppCompatActivity {
         prefs = getPreferences(MODE_PRIVATE);
 
         Button toggleButton = findViewById(R.id.toggle_boost);
+        TextView boostLabel = findViewById(R.id.boost_label);
+        SeekBar boostFader = findViewById(R.id.boost_fader);
         TextView faderLabel = findViewById(R.id.quietness_label);
         SeekBar fader = findViewById(R.id.quietness_fader);
 
         toggleButton.setText(isBoosted
                 ? getString(R.string.disable_boost)
                 : getString(R.string.enable_boost));
+
+        int savedBoostProgress = prefs.getInt("boost_progress", 100);
+        boostFader.setProgress(savedBoostProgress);
+        boostLabel.setText(getString(R.string.boost_template, savedBoostProgress));
 
         int savedProgress = prefs.getInt("quietness_progress", 0);
         fader.setProgress(savedProgress);
@@ -43,14 +49,20 @@ public class MainActivity extends AppCompatActivity {
             toggleButton.setOnClickListener(v -> {
                 if (!isBoosted) {
                     short bands = equalizer.getNumberOfBands();
+                    short maxLevel = equalizer.getBandLevelRange()[1];
+                    short boostLevel = (short) (maxLevel * boostFader.getProgress() / 100);
                     for (short i = 0; i < bands; i++) {
-                        equalizer.setBandLevel(i, (short) equalizer.getBandLevelRange()[1]);
+                        equalizer.setBandLevel(i, boostLevel);
                     }
                     equalizer.setEnabled(true);
                     Toast.makeText(this, R.string.boost_on_toast, Toast.LENGTH_SHORT).show();
                     toggleButton.setText(R.string.disable_boost);
                     isBoosted = true;
                 } else {
+                    short bands = equalizer.getNumberOfBands();
+                    for (short i = 0; i < bands; i++) {
+                        equalizer.setBandLevel(i, (short) 0);
+                    }
                     equalizer.setEnabled(false);
                     Toast.makeText(this, R.string.boost_off_toast, Toast.LENGTH_SHORT).show();
                     toggleButton.setText(R.string.enable_boost);
@@ -87,6 +99,40 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
                     prefs.edit().putInt("quietness_progress", seekBar.getProgress()).apply();
+                }
+            });
+
+            boostFader.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if (isBoosted) {
+                        if (progress == 0) {
+                            short bands = equalizer.getNumberOfBands();
+                            for (short i = 0; i < bands; i++) {
+                                equalizer.setBandLevel(i, (short) 0);
+                            }
+                            equalizer.setEnabled(false);
+                            isBoosted = false;
+                            Toast.makeText(MainActivity.this, R.string.boost_off_toast, Toast.LENGTH_SHORT).show();
+                            toggleButton.setText(R.string.enable_boost);
+                        } else {
+                            short maxLevel = equalizer.getBandLevelRange()[1];
+                            short bands = equalizer.getNumberOfBands();
+                            short boostLevel = (short) (maxLevel * progress / 100);
+                            for (short i = 0; i < bands; i++) {
+                                equalizer.setBandLevel(i, boostLevel);
+                            }
+                        }
+                    }
+                    boostLabel.setText(getString(R.string.boost_template, progress));
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    prefs.edit().putInt("boost_progress", seekBar.getProgress()).apply();
                 }
             });
         } else {

@@ -13,6 +13,21 @@
         android:contentDescription="@string/cd_toggle_boost" />
 
     <TextView
+        android:id="@+id/boost_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="" />
+
+    <SeekBar
+        android:id="@+id/boost_fader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/cd_boost_fader"
+        android:max="100" />
+
+    <TextView
         android:id="@+id/quietness_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

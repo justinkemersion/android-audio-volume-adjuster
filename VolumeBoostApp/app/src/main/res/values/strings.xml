@@ -7,6 +7,8 @@
     <string name="boost_off_toast">Boost OFF</string>
     <string name="equalizer_not_supported_toast">Equalizer not supported on this device</string>
     <string name="quietness_template">Quietness: %1$d%%</string>
+    <string name="boost_template">Boost: %1$d%%</string>
     <string name="cd_toggle_boost">Enable or disable Bluetooth audio boost</string>
     <string name="cd_quietness_fader">Adjust how quiet the audio can go below the device minimum</string>
+    <string name="cd_boost_fader">Adjust how much to boost Bluetooth audio volume</string>
 </resources>
