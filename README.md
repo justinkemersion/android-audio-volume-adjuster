@@ -5,6 +5,8 @@ A simple Android application to adjust audio levels on your device beyond the st
 - **Bluetooth Volume Boost**: When connected via Bluetooth, tap the button to boost the audio output.
 - **Quiet Mode**: Incrementally lower the volume below the device's minimum to achieve extra quiet playback.
 
+ <img src="docs/images/app_screenshot.png" alt="Sample Image" width="200">
+
 ## Requirements
 
 - Android 5.0 (API level 21) or higher
