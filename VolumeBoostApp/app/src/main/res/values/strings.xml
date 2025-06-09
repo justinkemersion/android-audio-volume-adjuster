@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Volume Boost</string>
+    <string name="enable_boost">Enable Boost</string>
+    <string name="disable_boost">Disable Boost</string>
+    <string name="boost_on_toast">Boost ON</string>
+    <string name="boost_off_toast">Boost OFF</string>
+    <string name="equalizer_not_supported_toast">Equalizer not supported on this device</string>
+    <string name="quietness_template">Quietness: %1$d%%</string>
+    <string name="cd_toggle_boost">Enable or disable Bluetooth audio boost</string>
+    <string name="cd_quietness_fader">Adjust how quiet the audio can go below the device minimum</string>
+</resources>

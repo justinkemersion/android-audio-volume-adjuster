@@ -1,9 +1,9 @@
 package com.example.volumeboost;
 
 import android.media.audiofx.Equalizer;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,27 +12,26 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
     private Equalizer equalizer;
     private boolean isBoosted = false;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
+        prefs = getPreferences(MODE_PRIVATE);
 
-        Button toggleButton = new Button(this);
-        toggleButton.setText("Toggle Volume Boost");
-        layout.addView(toggleButton);
+        Button toggleButton = findViewById(R.id.toggle_boost);
+        TextView faderLabel = findViewById(R.id.quietness_label);
+        SeekBar fader = findViewById(R.id.quietness_fader);
 
-        TextView faderLabel = new TextView(this);
-        faderLabel.setText("Quietness: 0%");
-        layout.addView(faderLabel);
+        toggleButton.setText(isBoosted
+                ? getString(R.string.disable_boost)
+                : getString(R.string.enable_boost));
 
-        SeekBar fader = new SeekBar(this);
-        fader.setMax(100);
-        layout.addView(fader);
-
-        setContentView(layout);
+        int savedProgress = prefs.getInt("quietness_progress", 0);
+        fader.setProgress(savedProgress);
+        faderLabel.setText(getString(R.string.quietness_template, savedProgress));
 
         try {
             equalizer = new Equalizer(0, 0);
@@ -48,11 +47,13 @@ public class MainActivity extends AppCompatActivity {
                         equalizer.setBandLevel(i, (short) equalizer.getBandLevelRange()[1]);
                     }
                     equalizer.setEnabled(true);
-                    Toast.makeText(this, "Boost ON", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.boost_on_toast, Toast.LENGTH_SHORT).show();
+                    toggleButton.setText(R.string.disable_boost);
                     isBoosted = true;
                 } else {
                     equalizer.setEnabled(false);
-                    Toast.makeText(this, "Boost OFF", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.boost_off_toast, Toast.LENGTH_SHORT).show();
+                    toggleButton.setText(R.string.enable_boost);
                     isBoosted = false;
                 }
             });
@@ -63,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
                     if (isBoosted) {
                         equalizer.setEnabled(false);
                         isBoosted = false;
-                        Toast.makeText(MainActivity.this, "Boost OFF", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, R.string.boost_off_toast, Toast.LENGTH_SHORT).show();
+                        toggleButton.setText(R.string.enable_boost);
                     }
                     if (progress == 0) {
                         equalizer.setEnabled(false);
@@ -76,15 +78,20 @@ public class MainActivity extends AppCompatActivity {
                         }
                         equalizer.setEnabled(true);
                     }
-                    faderLabel.setText("Quietness: " + progress + "%");
+                    faderLabel.setText(getString(R.string.quietness_template, progress));
                 }
 
-                @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-                @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    prefs.edit().putInt("quietness_progress", seekBar.getProgress()).apply();
+                }
             });
         } else {
             toggleButton.setEnabled(false);
-            Toast.makeText(this, "Equalizer not supported on this device", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.equalizer_not_supported_toast, Toast.LENGTH_LONG).show();
         }
     }
 
